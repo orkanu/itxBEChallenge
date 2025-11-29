@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static com.inditex.product.application.usecase.UseCaseHelpers.simuladoProductDetails;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,8 +62,8 @@ class ProductUseCaseTest {
     void shouldMapAllProducts() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("1", "2"));
 
-        when(productClient.getProductById("1")).thenReturn(simuladoProdDetails("1", "P1", 10.0, true));
-        when(productClient.getProductById("2")).thenReturn(simuladoProdDetails("2", "P2", 20.0, false));
+        when(productClient.getProductById("1")).thenReturn(simuladoProductDetails("1", "P1", 10.0, true));
+        when(productClient.getProductById("2")).thenReturn(simuladoProductDetails("2", "P2", 20.0, false));
 
         List<ProductDetails> result = useCase.getSimilarProducts(PRODUCT_ID);
 
@@ -88,7 +89,7 @@ class ProductUseCaseTest {
     void shouldFilterNullProductDetails() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("1", "2"));
 
-        when(productClient.getProductById("1")).thenReturn(simuladoProdDetails("1", "P1", 10.0, true));
+        when(productClient.getProductById("1")).thenReturn(simuladoProductDetails("1", "P1", 10.0, true));
         when(productClient.getProductById("2")).thenReturn(null);
 
         List<ProductDetails> result = useCase.getSimilarProducts(PRODUCT_ID);
@@ -132,12 +133,4 @@ class ProductUseCaseTest {
         verifyNoMoreInteractions(productClient);
     }
 
-    private static SimuladoProductDetails simuladoProdDetails(String id, String name, Double price, boolean availability) {
-        SimuladoProductDetails d = new SimuladoProductDetails();
-        d.setId(id);
-        d.setName(name);
-        d.setPrice(price);
-        d.setAvailability(availability);
-        return d;
-    }
 }

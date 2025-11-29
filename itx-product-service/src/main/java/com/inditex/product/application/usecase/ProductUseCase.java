@@ -8,6 +8,7 @@ import com.inditex.product.client.ProductClient;
 import com.inditex.product.client.exception.ClientException;
 import com.inditex.product.client.model.SimuladoProductDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,9 @@ public class ProductUseCase implements ProductApp {
         this.simuladoProductClient = simuladoProductClient;
     }
 
+    @Cacheable(
+            value = "similarProductsCache",
+            key = "#productId")
     public List<ProductDetails> getSimilarProducts(String productId) {
         List<String> similarProductIds = simuladoProductClient.getSimilarProductIds(productId);
         if (similarProductIds == null || similarProductIds.isEmpty()) {
