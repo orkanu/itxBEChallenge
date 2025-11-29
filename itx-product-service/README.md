@@ -10,6 +10,12 @@ The service is divided into 3 layers:
 - Client layer: contains the code to interact with the external product service (the provided mock server)
 - Service layer: contains the code to expose the application layer as a REST API
 
+### Client layer
+
+The client layer contains a REST client to interact with the mocks server. 
+It adheres to the contract defined in the `ProductClient` interface that way, if we need to use a different client
+to retrieve the data from a different source (like via MQ or SOAP) it can be easily replaced.
+
 ## Running the service
 
 To run the service, follow these steps:
