@@ -1,25 +1,29 @@
 package com.inditex.product.application.usecase;
 
-import com.inditex.product.application.exception.ApplicationException;
 import com.inditex.product.application.model.ProductDetails;
+import com.inditex.product.application.exception.BreakerApplicationException;
 import com.inditex.product.client.ProductClient;
 import com.inditex.product.client.exception.ClientException;
-import com.inditex.product.client.model.SimuladoProductDetails;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.inditex.product.application.usecase.UseCaseHelpers.simuladoProductDetails;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class ProductUseCaseTest {
@@ -28,8 +32,39 @@ class ProductUseCaseTest {
     @Mock
     private ProductClient productClient;
 
+    @Mock
+    private CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+
+    @Mock
+    private CircuitBreaker circuitBreaker;
+
+    @org.mockito.Spy
+    private ThreadPoolTaskExecutor resilienceTaskExecutor = new ThreadPoolTaskExecutor();
+
     @InjectMocks
     private ProductUseCase useCase;
+
+    @BeforeEach
+    void setupCircuitBreaker() {
+        // initialize real task executor so CompletableFuture.supplyAsync can execute tasks during tests
+        resilienceTaskExecutor.setCorePoolSize(2);
+        resilienceTaskExecutor.setMaxPoolSize(4);
+        resilienceTaskExecutor.setThreadNamePrefix("test-resilience-");
+        resilienceTaskExecutor.initialize();
+
+        when(circuitBreakerFactory.create("productClient")).thenReturn(circuitBreaker);
+        // By default, run the supplier without tripping the fallback
+        when(circuitBreaker.run(any(Supplier.class), any(Function.class)))
+                .thenAnswer(invocation -> {
+                    Supplier<?> supplier = invocation.getArgument(0);
+                    try {
+                        return supplier.get();
+                    } catch (Throwable t) {
+                        Function<Throwable, ?> fallback = invocation.getArgument(1);
+                        return fallback.apply(t);
+                    }
+                });
+    }
 
     @Test
     @DisplayName("Returns empty list when similar product IDs is null")
@@ -104,29 +139,27 @@ class ProductUseCaseTest {
     }
 
     @Test
-    @DisplayName("Client throws generic exception during product fetch -> ApplicationException")
-    void shouldCatchClientExceptionAndWrapItAsApplicationException() {
+    @DisplayName("Client exception during product fetch causes BreakerApplicationException to propagate")
+    void shouldPropagateBreakerExceptionOnClientFailure() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("1", "2"));
         when(productClient.getProductById("1")).thenThrow(new ClientException("Something went wrong"));
 
-        ApplicationException ex = assertThrows(ApplicationException.class, () -> useCase.getSimilarProducts(PRODUCT_ID));
-        assertThat(ex.getMessage(), is("Something went wrong"));
+        org.junit.jupiter.api.Assertions.assertThrows(BreakerApplicationException.class,
+                () -> useCase.getSimilarProducts(PRODUCT_ID));
 
         verify(productClient, times(1)).getSimilarProductIds(PRODUCT_ID);
         verify(productClient, times(1)).getProductById("1");
-        // Stream short-circuit is not guaranteed if there is an exception during iteration but, due to eager collection,
-        // it will stop on the first thrown exception
-        verify(productClient, Mockito.never()).getProductById("2");
+        verify(productClient, never()).getProductById("2");
     }
 
     @Test
-    @DisplayName("Client 404 Not Found -> ApplicationException propagated with message")
-    void shouldWrapClient404NotFoundExceptionAsApplicationException() {
+    @DisplayName("Client 404 Not Found leads to BreakerApplicationException propagation")
+    void shouldPropagateBreakerExceptionOn404() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("404"));
         when(productClient.getProductById("404")).thenThrow(new ClientException("404 Not Found"));
 
-        ApplicationException ex = assertThrows(ApplicationException.class, () -> useCase.getSimilarProducts(PRODUCT_ID));
-        assertThat(ex.getMessage(), is("404 Not Found"));
+        org.junit.jupiter.api.Assertions.assertThrows(BreakerApplicationException.class,
+                () -> useCase.getSimilarProducts(PRODUCT_ID));
 
         verify(productClient, times(1)).getSimilarProductIds(PRODUCT_ID);
         verify(productClient, times(1)).getProductById("404");

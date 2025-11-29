@@ -14,7 +14,7 @@ import static com.inditex.product.service.mapper.ProductDTOMapper.MAPPER;
 @RestController
 @RequestMapping("/product")
 public class ProductController extends ProductControllerBase implements ProductService {
-    private ProductApp productUseCase;
+    private final ProductApp productUseCase;
 
     @Autowired
     public ProductController(ProductApp productUseCase) {

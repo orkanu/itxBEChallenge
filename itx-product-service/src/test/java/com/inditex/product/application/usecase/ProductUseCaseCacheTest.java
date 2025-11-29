@@ -3,7 +3,6 @@ package com.inditex.product.application.usecase;
 import com.inditex.product.application.model.ProductDetails;
 import com.inditex.product.application.ProductApp;
 import com.inditex.product.client.ProductClient;
-import com.inditex.product.client.model.SimuladoProductDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +17,19 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.inditex.product.application.usecase.UseCaseHelpers.simuladoProductDetails;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ProductUseCase.class, ProductUseCaseCacheTest.MockConfig.class, ProductUseCaseCacheTest.TestCacheConfig.class})
@@ -126,6 +131,39 @@ class ProductUseCaseCacheTest {
         @Bean
         ProductClient productClient() {
             return Mockito.mock(ProductClient.class);
+        }
+
+        @Bean(name = "resilienceTaskExecutor")
+        ThreadPoolTaskExecutor resilienceTaskExecutor() {
+            ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+            executor.setCorePoolSize(2);
+            executor.setMaxPoolSize(4);
+            executor.setThreadNamePrefix("test-resilience-");
+            executor.initialize();
+            return executor;
+        }
+
+        @Bean
+        CircuitBreaker circuitBreaker() {
+            CircuitBreaker cb = Mockito.mock(CircuitBreaker.class);
+            Mockito.when(cb.run(any(Supplier.class), any(Function.class)))
+                    .thenAnswer(invocation -> {
+                        Supplier<?> supplier = invocation.getArgument(0);
+                        try {
+                            return supplier.get();
+                        } catch (Throwable t) {
+                            Function<Throwable, ?> fallback = invocation.getArgument(1);
+                            return fallback.apply(t);
+                        }
+                    });
+            return cb;
+        }
+
+        @Bean
+        CircuitBreakerFactory<?, ?> circuitBreakerFactory(CircuitBreaker circuitBreaker) {
+            CircuitBreakerFactory<?, ?> factory = Mockito.mock(CircuitBreakerFactory.class);
+            Mockito.when(factory.create("productClient")).thenReturn(circuitBreaker);
+            return factory;
         }
     }
 

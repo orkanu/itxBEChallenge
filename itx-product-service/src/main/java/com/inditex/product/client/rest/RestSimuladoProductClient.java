@@ -1,9 +1,10 @@
 package com.inditex.product.client.rest;
 
-import com.inditex.product.application.model.ProductDetails;
 import com.inditex.product.client.ProductClient;
 import com.inditex.product.client.exception.ClientException;
 import com.inditex.product.client.model.SimuladoProductDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,9 @@ import java.util.List;
 @Component
 public class RestSimuladoProductClient implements ProductClient {
 
-    private RestTemplate restTemplate;
+    private final Logger logger = LoggerFactory.getLogger(RestSimuladoProductClient.class);
+
+    private final RestTemplate restTemplate;
 
     @Autowired
     public RestSimuladoProductClient(@Qualifier("simuladoProductClient") RestTemplate restTemplate) {
@@ -28,8 +31,10 @@ public class RestSimuladoProductClient implements ProductClient {
         try {
             return restTemplate.getForObject(url, SimuladoProductDetails.class);
         } catch (HttpClientErrorException.NotFound e) {
+            logger.warn("Product not found: {}", productId);
             throw new ClientException("Product not found: " + productId, e);
         } catch (HttpClientErrorException e) {
+            logger.warn("Client error calling getProductById for id [{}]: {}", productId, e.getMessage());
             throw new ClientException("Client error calling getProductById for: " + productId, e);
         }
     }
