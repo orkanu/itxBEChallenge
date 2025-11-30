@@ -1,5 +1,16 @@
 version: "3.3"
 services:
+  itx-product-service:
+    build:
+      context: ./itx-product-service
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    environment:
+      - simulado.api.host=http://host.docker.internal:3001
+    volumes:
+      - ./itx-product-service/src/main/resources/application.properties:/app/application.properties
+
   influxdb:
     image: influxdb:1.8.2
     ports:
@@ -16,8 +27,9 @@ services:
       - GF_AUTH_BASIC_ENABLED=false
     volumes:
       - ./shared/grafana:/etc/grafana/provisioning/
+
   simulado:
-    image : ldabiralai/simulado:latest
+    image: ldabiralai/simulado:latest
     ports:
       - "3001:80"
     volumes:

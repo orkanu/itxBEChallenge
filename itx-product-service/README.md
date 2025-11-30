@@ -40,3 +40,13 @@ To run the service using Maven, follow these steps:
 3. The service will be available at http://localhost:5000
 4. To stop the service, press Ctrl+C
 
+### Via Docker
+
+To run the service using Docker, follow these steps:
+
+1. Clone the repository
+2. Inside `ìtx-product-service`, run `mvn package` to build the JAR file
+3. From the root of the repository, where the `docker-compose.yaml` file is located, run `docker compose up -d simulado influxdb grafana itx-product-service` to get the service and the mock server running
+4. The service will be available at http://localhost:5000
+5. To stop everything, run `docker compose down`
+
