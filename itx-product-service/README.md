@@ -50,3 +50,8 @@ To run the service using Docker, follow these steps:
 4. The service will be available at http://localhost:5000
 5. To stop everything, run `docker compose down`
 
+## Testing
+
+Running `mvn clean install` will run unit and BDD (Cucumber) tests.
+
+Cucumber reports will be generated in `target/cucumber-html-reports` directory.
