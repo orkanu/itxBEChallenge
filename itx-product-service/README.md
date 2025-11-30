@@ -55,3 +55,13 @@ To run the service using Docker, follow these steps:
 Running `mvn clean install` will run unit and BDD (Cucumber) tests.
 
 Cucumber reports will be generated in `target/cucumber-html-reports` directory.
+
+### Improvements
+
+The following improvements could be made:
+
+- Improve error handling being more specific about the cause of the error
+- Use UUIDs when logging errors to help tracing
+- Use correlation IDs to trace requests across services
+- Move to non-blocking I/O to improve performance and reduce latency using WebClient instead of RestTemplate, for example
+- Add more tests to increase edge case coverage
