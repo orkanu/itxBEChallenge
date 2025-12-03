@@ -13,7 +13,7 @@ public class CacheEventLogger implements CacheEventListener<Object, Object> {
 
     @Override
     public void onEvent(
-            CacheEvent<? extends Object, ? extends Object> cacheEvent) {
+            CacheEvent<?, ?> cacheEvent) {
         logger.info("Cache event occurred for key: {}, old value: {}, new value: {}",
                 cacheEvent.getKey(), cacheEvent.getOldValue(), cacheEvent.getNewValue());
     }

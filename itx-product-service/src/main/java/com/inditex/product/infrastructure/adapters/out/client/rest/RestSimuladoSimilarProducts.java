@@ -46,7 +46,7 @@ public class RestSimuladoSimilarProducts implements SimilarProducts {
             throw new CircuitBreakerException("Similar product service temporarily unavailable (circuit open)", t);
         }
         logger.warn("Product ID - error fetching", t);
-        throw new CircuitBreakerException("There has been an error fetching product by ID", t);
+        throw new CircuitBreakerException("There has been an error fetching product for id: " + productId, t);
     }
 
     @CircuitBreaker(name = "client", fallbackMethod = "fallbackGetSimilarProductIds")
@@ -67,6 +67,6 @@ public class RestSimuladoSimilarProducts implements SimilarProducts {
         if (t instanceof CallNotPermittedException) {
             throw new CircuitBreakerException("Similar product service temporarily unavailable (circuit open)", t);
         }
-        throw new CircuitBreakerException("There has been an error fetching similar product ids", t);
+        throw new CircuitBreakerException("There has been an error fetching similar product ids for product " + productId, t);
     }
 }

@@ -1,6 +1,5 @@
 package com.inditex.product.infrastructure.adapters.in.exception;
 
-import com.inditex.product.domain.exception.ApplicationException;
 import com.inditex.product.domain.exception.CircuitBreakerException;
 import com.inditex.product.domain.exception.ProductNotFoundException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -25,11 +24,6 @@ public class RestAdapterExceptionHandler {
         if (ex.getCause() instanceof CallNotPermittedException) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<String> handleAppException(ApplicationException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
