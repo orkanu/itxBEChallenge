@@ -1,8 +1,8 @@
 package com.inditex.product.application.usecase;
 
 import com.inditex.product.application.ports.input.SimilarProductsUseCase;
-import com.inditex.product.domain.model.ProductDetails;
 import com.inditex.product.application.ports.output.SimilarProducts;
+import com.inditex.product.domain.model.ProductDetails;
 import com.inditex.product.domain.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import static com.inditex.product.application.usecase.UseCaseHelpers.buildProductDetails;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

@@ -2,26 +2,22 @@ package com.inditex.product.application.usecase;
 
 import com.inditex.product.application.ports.output.SimilarProducts;
 import com.inditex.product.domain.exception.CircuitBreakerException;
+import com.inditex.product.domain.exception.ProductNotFoundException;
 import com.inditex.product.domain.model.ProductDetails;
 import com.inditex.product.domain.service.ProductService;
-import com.inditex.product.infrastructure.adapters.out.client.exception.ClientException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.inditex.product.application.usecase.UseCaseHelpers.buildProductDetails;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -29,29 +25,12 @@ import static org.mockito.Mockito.*;
 class ProductServiceTest {
 
     private static final String PRODUCT_ID = "123";
+
     @Mock
     private SimilarProducts productClient;
 
-    @Mock
-    private CircuitBreaker circuitBreaker;
-
     @InjectMocks
     private ProductService useCase;
-
-    @BeforeEach
-    void setupCircuitBreaker() {
-        // By default, run the supplier without tripping the fallback
-        when(circuitBreaker.run(any(Supplier.class), any(Function.class)))
-                .thenAnswer(invocation -> {
-                    Supplier<?> supplier = invocation.getArgument(0);
-                    try {
-                        return supplier.get();
-                    } catch (Throwable t) {
-                        Function<Throwable, ?> fallback = invocation.getArgument(1);
-                        return fallback.apply(t);
-                    }
-                });
-    }
 
     @Test
     @DisplayName("Returns empty list when similar product IDs is null")
@@ -129,10 +108,9 @@ class ProductServiceTest {
     @DisplayName("Client exception during product fetch causes BreakerApplicationException to propagate")
     void shouldPropagateBreakerExceptionOnClientFailure() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("1", "2"));
-        when(productClient.getProductById("1")).thenThrow(new ClientException("Something went wrong"));
+        when(productClient.getProductById("1")).thenThrow(new CircuitBreakerException("Something went wrong"));
 
-        org.junit.jupiter.api.Assertions.assertThrows(CircuitBreakerException.class,
-                () -> useCase.getSimilarProducts(PRODUCT_ID));
+        assertThrows(CircuitBreakerException.class, () -> useCase.getSimilarProducts(PRODUCT_ID));
 
         verify(productClient, times(1)).getSimilarProductIds(PRODUCT_ID);
         verify(productClient, times(1)).getProductById("1");
@@ -140,13 +118,12 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Client 404 Not Found leads to BreakerApplicationException propagation")
+    @DisplayName("Client 404 Not Found leads to ProductNotFoundException propagation")
     void shouldPropagateBreakerExceptionOn404() {
         when(productClient.getSimilarProductIds(PRODUCT_ID)).thenReturn(List.of("404"));
-        when(productClient.getProductById("404")).thenThrow(new ClientException("404 Not Found"));
+        when(productClient.getProductById("404")).thenThrow(new ProductNotFoundException("404 Not Found"));
 
-        org.junit.jupiter.api.Assertions.assertThrows(CircuitBreakerException.class,
-                () -> useCase.getSimilarProducts(PRODUCT_ID));
+        assertThrows(ProductNotFoundException.class, () -> useCase.getSimilarProducts(PRODUCT_ID));
 
         verify(productClient, times(1)).getSimilarProductIds(PRODUCT_ID);
         verify(productClient, times(1)).getProductById("404");

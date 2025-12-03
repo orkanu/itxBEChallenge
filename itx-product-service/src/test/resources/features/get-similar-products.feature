@@ -40,7 +40,7 @@ Feature: Get Similar Products
     And product ID "5" returns "Not Found"
     When I search by product ID "4"
     Then the response status is "INTERNAL_SERVER_ERROR"
-    Then the result contains error "There has been an error fetching product by ID"
+    Then the result contains error "Product not found: 5"
 
 
   Scenario: Should return error when an invalid param value is send

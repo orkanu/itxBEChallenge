@@ -1,11 +1,11 @@
 package com.inditex.product.bdd.stepdefs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inditex.product.bdd.CucumberSpringConfig;
-import com.inditex.product.infrastructure.adapters.in.dto.ProductDetailsDTO;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.inditex.product.bdd.CucumberSpringConfig;
+import com.inditex.product.infrastructure.adapters.in.dto.ProductDetailsDTO;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -14,11 +14,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
