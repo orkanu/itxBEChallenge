@@ -2,7 +2,7 @@ package com.inditex.product.bdd.stepdefs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inditex.product.bdd.CucumberSpringConfig;
-import com.inditex.product.service.model.ProductDetailsDTO;
+import com.inditex.product.infrastructure.adapters.in.dto.ProductDetailsDTO;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
