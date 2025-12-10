@@ -39,7 +39,7 @@ Feature: Get Similar Products
       | 4  | 5  |
     And product ID "5" returns "Not Found"
     When I search by product ID "4"
-    Then the response status is "INTERNAL_SERVER_ERROR"
+    Then the response status is "NOT_FOUND"
     Then the result contains error "Product not found: 5"
 
 
