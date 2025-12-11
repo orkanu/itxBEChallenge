@@ -3,7 +3,7 @@ package com.inditex.product.client.rest;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.inditex.product.domain.exception.ProductNotFoundException;
+import com.inditex.product.shared.exception.ProductNotFoundException;
 import com.inditex.product.domain.model.ProductDetails;
 import com.inditex.product.infrastructure.adapters.out.client.rest.RestSimuladoSimilarProducts;
 import org.junit.jupiter.api.AfterEach;

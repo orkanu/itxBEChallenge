@@ -1,8 +1,8 @@
 package com.inditex.product.infrastructure.adapters.out.client.rest;
 
 import com.inditex.product.application.ports.output.SimilarProducts;
-import com.inditex.product.domain.exception.CircuitBreakerException;
-import com.inditex.product.domain.exception.ProductNotFoundException;
+import com.inditex.product.shared.exception.CircuitBreakerException;
+import com.inditex.product.shared.exception.ProductNotFoundException;
 import com.inditex.product.domain.model.ProductDetails;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

@@ -3,7 +3,7 @@ package com.inditex.product.application.usecase;
 import com.inditex.product.application.ports.input.SimilarProductsUseCase;
 import com.inditex.product.application.ports.output.SimilarProducts;
 import com.inditex.product.domain.model.ProductDetails;
-import com.inditex.product.domain.service.ProductService;
+import com.inditex.product.application.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

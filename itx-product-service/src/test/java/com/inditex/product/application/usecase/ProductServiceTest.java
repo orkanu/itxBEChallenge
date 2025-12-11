@@ -1,10 +1,10 @@
 package com.inditex.product.application.usecase;
 
 import com.inditex.product.application.ports.output.SimilarProducts;
-import com.inditex.product.domain.exception.CircuitBreakerException;
-import com.inditex.product.domain.exception.ProductNotFoundException;
+import com.inditex.product.shared.exception.CircuitBreakerException;
+import com.inditex.product.shared.exception.ProductNotFoundException;
 import com.inditex.product.domain.model.ProductDetails;
-import com.inditex.product.domain.service.ProductService;
+import com.inditex.product.application.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

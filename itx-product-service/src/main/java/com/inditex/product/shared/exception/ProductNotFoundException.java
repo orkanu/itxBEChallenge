@@ -1,4 +1,4 @@
-package com.inditex.product.domain.exception;
+package com.inditex.product.shared.exception;
 
 public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException(String message) {

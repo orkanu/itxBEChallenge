@@ -1,4 +1,4 @@
-package com.inditex.product.domain.service;
+package com.inditex.product.application.service;
 
 import com.inditex.product.application.ports.input.SimilarProductsUseCase;
 import com.inditex.product.application.ports.output.SimilarProducts;

@@ -1,7 +1,7 @@
 package com.inditex.product.infrastructure.adapters.in.exception;
 
-import com.inditex.product.domain.exception.CircuitBreakerException;
-import com.inditex.product.domain.exception.ProductNotFoundException;
+import com.inditex.product.shared.exception.CircuitBreakerException;
+import com.inditex.product.shared.exception.ProductNotFoundException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

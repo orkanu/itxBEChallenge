@@ -1,4 +1,4 @@
-package com.inditex.product.domain.exception;
+package com.inditex.product.shared.exception;
 
 public class CircuitBreakerException extends RuntimeException {
     public CircuitBreakerException(String message) { super(message); }
