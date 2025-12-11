@@ -1,7 +1,7 @@
 package com.inditex.product.application.service;
 
 import com.inditex.product.application.ports.input.SimilarProductsUseCase;
-import com.inditex.product.application.ports.output.SimilarProducts;
+import com.inditex.product.domain.model.ports.output.SimilarProducts;
 import com.inditex.product.domain.model.ProductDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.inditex.product.infrastructure.adapters.config.CacheConfig.CACHE;
+import static com.inditex.product.infrastructure.adapters.config.CacheConfig.CACHE_PRODUCT;
+import static com.inditex.product.infrastructure.adapters.config.CacheConfig.CACHE_PRODUCT_LIST;
 
 @Service
 public class ProductService implements SimilarProductsUseCase {
@@ -28,7 +29,7 @@ public class ProductService implements SimilarProductsUseCase {
     }
 
     @Override
-    @Cacheable(value = CACHE, key = "#productId")
+    @Cacheable(value = CACHE_PRODUCT_LIST, key = "#productId")
     public List<ProductDetails> getSimilarProducts(String productId) {
         List<String> similarProductIds = similarProducts.getSimilarProductIds(productId);
 
@@ -38,8 +39,13 @@ public class ProductService implements SimilarProductsUseCase {
         }
 
         return similarProductIds.stream()
-                .map(similarProducts::getProductById)
+                .map(this::getProductById)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = CACHE_PRODUCT, key = "#productId")
+    public ProductDetails getProductById(String productId) {
+        return similarProducts.getProductById(productId);
     }
 }

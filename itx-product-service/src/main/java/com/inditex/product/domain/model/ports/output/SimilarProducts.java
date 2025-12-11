@@ -1,4 +1,4 @@
-package com.inditex.product.application.ports.output;
+package com.inditex.product.domain.model.ports.output;
 
 import com.inditex.product.domain.model.ProductDetails;
 

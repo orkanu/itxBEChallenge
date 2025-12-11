@@ -1,6 +1,6 @@
 package com.inditex.product.infrastructure.adapters.out.client.rest;
 
-import com.inditex.product.application.ports.output.SimilarProducts;
+import com.inditex.product.domain.model.ports.output.SimilarProducts;
 import com.inditex.product.shared.exception.CircuitBreakerException;
 import com.inditex.product.shared.exception.ProductNotFoundException;
 import com.inditex.product.domain.model.ProductDetails;
